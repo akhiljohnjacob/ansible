@@ -1,14 +1,37 @@
-/* Jenkinsfile (Declarative Pipeline) */
-
-/* Requires the Docker Pipeline plugin */
 pipeline {
-    agent { docker { image 'maven:3.10.0-eclipse-temurin-21-alpine' } }
+    agent any
+
+    options {
+        overrideIndexTriggers(false)
+    }
+
+    parameters {
+        string(
+            name: 'ENVIRONMENT',
+            defaultValue: 'dev',
+            description: 'Environment to deploy'
+        )
+
+        choice(
+            name: 'ACTION',
+            choices: ['build', 'deploy', 'rollback'],
+            description: 'Select the action to perform'
+        )
+
+        booleanParam(
+            name: 'RUN_TESTS',
+            defaultValue: true,
+            description: 'Run automated tests?'
+        )
+    }
+
     stages {
-        stage('build') {
+        stage('Show Parameters') {
             steps {
-                sh 'mvn --version'
+                echo "Environment: ${params.ENVIRONMENT}"
+                echo "Action: ${params.ACTION}"
+                echo "Run Tests: ${params.RUN_TESTS}"
             }
         }
     }
 }
-
